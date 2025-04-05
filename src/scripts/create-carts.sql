@@ -1,0 +1,7 @@
+CREATE TABLE carts (
+    id UUID PRIMARY KEY,
+    user_id UUID NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    status VARCHAR(10) NOT NULL CHECK (status IN ('OPEN', 'ORDERED'))
+);

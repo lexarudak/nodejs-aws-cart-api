@@ -1,24 +1,28 @@
 import { NestFactory } from '@nestjs/core';
-
-import helmet from 'helmet';
-
 import { AppModule } from './app.module';
-import { ConfigService } from '@nestjs/config';
+import helmet from 'helmet';
+import { Handler, Context, APIGatewayProxyEvent } from 'aws-lambda';
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const serverlessExpress = require('@vendia/serverless-express');
+
+let server: Handler;
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  const configService = app.get(ConfigService);
-
-  const port = configService.get('APP_PORT') || 4000;
-
-  app.enableCors({
-    origin: (req, callback) => callback(null, true),
-  });
   app.use(helmet());
+  app.enableCors({ origin: '*' });
 
-  await app.listen(port, () => {
-    console.log('App is running on %s port', port);
-  });
+  await app.init();
+
+  const expressApp = app.getHttpAdapter().getInstance();
+  return serverlessExpress({ app: expressApp });
 }
-bootstrap();
+
+export const handler: Handler = async (
+  event: APIGatewayProxyEvent,
+  context: Context,
+) => {
+  server = server ?? (await bootstrap());
+  return server(event, context);
+};
