@@ -2,7 +2,8 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import helmet from 'helmet';
 import { Handler, Context, APIGatewayProxyEvent } from 'aws-lambda';
-import serverlessExpress from '@vendia/serverless-express';
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const serverlessExpress = require('@vendia/serverless-express');
 
 let server: Handler;
 
